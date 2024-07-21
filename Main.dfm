@@ -80,4 +80,10 @@ object Form1: TForm1
     Left = 96
     Top = 112
   end
+  object WorkTimer: TTimer
+    Enabled = False
+    OnTimer = WorkTimerTimer
+    Left = 200
+    Top = 112
+  end
 end

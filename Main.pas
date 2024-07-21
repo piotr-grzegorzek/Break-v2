@@ -16,14 +16,18 @@ type
     btnMute: TButton;
     Label1: TLabel;
     TrayIcon1: TTrayIcon;
+    WorkTimer: TTimer;
     procedure FormCreate(Sender: TObject);
     procedure FormResize(Sender: TObject);
     procedure btnSettingsClick(Sender: TObject);
     procedure ToTray;
     procedure btnOKClick(Sender: TObject);
     procedure TrayIcon1Click(Sender: TObject);
+    procedure WorkTimerTimer(Sender: TObject);
   private
-    { Private declarations }
+    workTime: Integer;
+    breakTime: Integer;
+    currentTime: Integer;
   public
     { Public declarations }
   end;
@@ -35,8 +39,24 @@ implementation
 
 {$R *.dfm}
 
+procedure AppToFront;
+var
+  Input: TInput;
+begin
+  ZeroMemory(@Input, SizeOf(Input));
+  SendInput(1, Input, SizeOf(Input)); // don't send anyting actually to another app..
+  SetForegroundWindow(Application.Handle);
+end;
+
 procedure TForm1.btnOKClick(Sender: TObject);
 begin
+  if Label1.Caption = '0' then
+  begin
+    if workTime > 0 then
+    begin
+      WorkTimer.Enabled := True;
+    end;
+  end;
   ToTray;
 end;
 
@@ -54,6 +74,8 @@ begin
     begin
       IniFile.WriteInteger('Settings', 'WorkTime', AWorkTime);
       IniFile.WriteInteger('Settings', 'BreakTime', ABreakTime);
+      workTime := AWorkTime;
+      breakTime := ABreakTime;
     end;
   finally
     IniFile.Free;
@@ -61,9 +83,26 @@ begin
 end;
 
 procedure TForm1.FormCreate(Sender: TObject);
+var
+  AWorkTime: Integer;
+  ABreakTime: Integer;
+  IniFile: TIniFile;
 begin
   Form1.Color := TColor(RGB(24, 24, 24));
   ToTray;
+
+  IniFile := TIniFile.Create('./preferences.ini');
+  try
+    workTime := IniFile.ReadInteger('Settings', 'WorkTime', 0);
+    breakTime := IniFile.ReadInteger('Settings', 'BreakTime', 0);
+  finally
+    IniFile.Free;
+  end;
+
+  if workTime > 0 then
+  begin
+    WorkTimer.Enabled := True;
+  end;
 end;
 
 procedure TForm1.FormResize(Sender: TObject);
@@ -89,6 +128,30 @@ begin
   WindowState := wsMaximized;
   TrayIcon1.Visible := False;
   ShowWindow(Application.Handle, SW_SHOWNORMAL);
+  AppToFront;
+end;
+
+procedure TForm1.WorkTimerTimer(Sender: TObject);
+begin
+  if currentTime + 1 < workTime then
+  begin
+    // work continues
+    currentTime := currentTime + 1;
+    Label1.Caption := IntToStr(workTime - currentTime);
+  end
+  else if currentTime + 1 = workTime then
+  begin
+    // work ended
+
+    TrayIcon1Click(nil);
+    currentTime := currentTime + 1;
+    Label1.Caption := IntToStr(workTime - currentTime);
+  end
+  else
+  begin
+    WorkTimer.Enabled := False;
+    currentTime := 0;
+  end;
 end;
 
 end.
