@@ -9,8 +9,7 @@ uses
 
 begin
   Application.Initialize;
-  Application.MainFormOnTaskbar := True;
+  Application.MainFormOnTaskbar := true;
   Application.CreateForm(TForm1, Form1);
-  Application.CreateForm(TfrmSettings, frmSettings);
   Application.Run;
 end.

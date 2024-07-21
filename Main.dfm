@@ -42,6 +42,7 @@ object Form1: TForm1
     Caption = 'OK'
     DisabledImageName = 'btnOK'
     TabOrder = 0
+    OnClick = btnOKClick
   end
   object btnBreak: TButton
     Left = 557
@@ -73,5 +74,10 @@ object Form1: TForm1
     Caption = 'Mute'
     DisabledImageName = 'btnOK'
     TabOrder = 3
+  end
+  object TrayIcon1: TTrayIcon
+    OnClick = TrayIcon1Click
+    Left = 96
+    Top = 112
   end
 end
