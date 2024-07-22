@@ -4,17 +4,18 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls;
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.Mask,
+  RxToolEdit, RxCurrEdit;
 
 type
   TfrmSettings = class(TForm)
     lblWorkTime: TLabel;
     lblBreakTime: TLabel;
-    edtWorkTime: TEdit;
-    edtBreakTime: TEdit;
     Panel1: TPanel;
     btnCancel: TButton;
     Button1: TButton;
+    edtWorkTime: TRxCalcEdit;
+    edtBreakTime: TRxCalcEdit;
   private
     { Private declarations }
   public

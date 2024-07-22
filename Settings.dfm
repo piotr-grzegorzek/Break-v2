@@ -13,9 +13,9 @@ object frmSettings: TfrmSettings
   Font.Style = []
   TextHeight = 15
   object Panel1: TPanel
-    Left = 213
+    Left = 224
     Top = 192
-    Width = 201
+    Width = 190
     Height = 57
     BevelOuter = bvNone
     TabOrder = 0
@@ -33,19 +33,23 @@ object frmSettings: TfrmSettings
       Height = 15
       Caption = 'Work time'
     end
-    object edtBreakTime: TEdit
-      Left = 72
-      Top = 28
+    object edtWorkTime: TRxCalcEdit
+      Left = 61
+      Top = 0
       Width = 121
       Height = 23
-      TabOrder = 1
-    end
-    object edtWorkTime: TEdit
-      Left = 72
-      Top = 2
-      Width = 121
-      Height = 23
+      DecimalPlaces = 0
+      NumGlyphs = 2
       TabOrder = 0
+    end
+    object edtBreakTime: TRxCalcEdit
+      Left = 61
+      Top = 26
+      Width = 121
+      Height = 23
+      DecimalPlaces = 0
+      NumGlyphs = 2
+      TabOrder = 1
     end
   end
   object btnCancel: TButton
