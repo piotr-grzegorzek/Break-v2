@@ -75,6 +75,7 @@ object Form1: TForm1
     Caption = 'Mute'
     DisabledImageName = 'btnOK'
     TabOrder = 3
+    OnClick = btnMuteClick
   end
   object TrayIcon1: TTrayIcon
     OnClick = TrayIcon1Click

@@ -5,7 +5,9 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, Vcl.ExtCtrls,
-  IniFiles, Settings;
+  IniFiles, MMSystem,
+
+  Settings;
 
 type
   TForm1 = class(TForm)
@@ -27,6 +29,7 @@ type
     procedure TrayIcon1Click(Sender: TObject);
     procedure WorkTimerTimer(Sender: TObject);
     procedure BreakTimerTimer(Sender: TObject);
+    procedure btnMuteClick(Sender: TObject);
 
   private
     // Private Fields
@@ -40,6 +43,8 @@ type
     procedure ToTray;
     procedure RestoreFromTray;
     procedure AppToFront;
+    procedure PlayNotification;
+    procedure StopNotification;
 
   public
     { Public declarations }
@@ -95,6 +100,7 @@ procedure TForm1.btnOKClick(Sender: TObject);
 begin
   if (Label1.Caption = '0') and (FWorkTime > 0) then
   begin
+    StopNotification;
     Label1.Caption := IntToStr(FWorkTime - FCurrentTime);
     WorkTimer.Enabled := True;
   end;
@@ -105,9 +111,15 @@ procedure TForm1.btnBreakClick(Sender: TObject);
 begin
   if (Label1.Caption = '0') and (FBreakTime > 0) then
   begin
+    StopNotification;
     Label1.Caption := IntToStr(FBreakTime - FCurrentTime);
     BreakTimer.Enabled := True;
   end;
+end;
+
+procedure TForm1.btnMuteClick(Sender: TObject);
+begin
+  StopNotification;
 end;
 
 procedure TForm1.TrayIcon1Click(Sender: TObject);
@@ -122,6 +134,7 @@ begin
   if FCurrentTime >= FWorkTime then
   begin
     // work ended
+    PlayNotification;
     RestoreFromTray;
     WorkTimer.Enabled := False;
     FCurrentTime := 0;
@@ -135,6 +148,7 @@ begin
   if FCurrentTime >= FBreakTime then
   begin
     // break ended
+    PlayNotification;
     BreakTimer.Enabled := False;
     FCurrentTime := 0;
   end;
@@ -197,6 +211,16 @@ begin
   ZeroMemory(@Input, SizeOf(Input));
   SendInput(1, Input, SizeOf(Input));
   SetForegroundWindow(Application.Handle);
+end;
+
+procedure TForm1.PlayNotification;
+begin
+  PlaySound('notification.wav', 0, SND_FILENAME or SND_NODEFAULT or SND_ASYNC or SND_LOOP);
+end;
+
+procedure TForm1.StopNotification;
+begin
+  PlaySound(nil, 0, 0);
 end;
 
 end.
