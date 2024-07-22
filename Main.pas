@@ -16,19 +16,21 @@ type
     Label1: TLabel;
     TrayIcon1: TTrayIcon;
     WorkTimer: TTimer;
+    BreakTimer: TTimer;
     procedure FormCreate(Sender: TObject);
     procedure FormResize(Sender: TObject);
     procedure btnSettingsClick(Sender: TObject);
     procedure btnOKClick(Sender: TObject);
     procedure TrayIcon1Click(Sender: TObject);
     procedure WorkTimerTimer(Sender: TObject);
+    procedure btnBreakClick(Sender: TObject);
+    procedure BreakTimerTimer(Sender: TObject);
   private
     FWorkTime: Integer;
     FBreakTime: Integer;
     FCurrentTime: Integer;
     procedure LoadSettings;
     procedure SaveSettings(AWorkTime, ABreakTime: Integer);
-    procedure UpdateLabel;
     procedure ToTray;
     procedure RestoreFromTray;
     procedure AppToFront;
@@ -51,18 +53,37 @@ var
   Input: TInput;
 begin
   ZeroMemory(@Input, SizeOf(Input));
-  SendInput(1, Input, SizeOf(Input)); // don't send anything actually to another app..
+  SendInput(1, Input, SizeOf(Input));
   SetForegroundWindow(Application.Handle);
+end;
+
+procedure TForm1.BreakTimerTimer(Sender: TObject);
+begin
+  Inc(FCurrentTime);
+  Label1.Caption := IntToStr(FBreakTime - FCurrentTime);
+  if FCurrentTime >= FBreakTime then
+  begin
+    // break ended
+    BreakTimer.Enabled := False;
+    FCurrentTime := 0;
+  end;
+end;
+
+procedure TForm1.btnBreakClick(Sender: TObject);
+begin
+  if (Label1.Caption = '0') and (FBreakTime > 0) then
+  begin
+    Label1.Caption := IntToStr(FBreakTime - FCurrentTime);
+    BreakTimer.Enabled := True;
+  end;
 end;
 
 procedure TForm1.btnOKClick(Sender: TObject);
 begin
-  if Label1.Caption = '0' then
+  if (Label1.Caption = '0') and (FWorkTime > 0) then
   begin
-    if FWorkTime > 0 then
-    begin
-      WorkTimer.Enabled := True;
-    end;
+    Label1.Caption := IntToStr(FWorkTime - FCurrentTime);
+    WorkTimer.Enabled := True;
   end;
   ToTray;
 end;
@@ -118,7 +139,7 @@ end;
 procedure TForm1.RestoreFromTray;
 begin
   Show;
-  WindowState := wsNormal;
+  WindowState := wsMaximized;
   TrayIcon1.Visible := False;
   ShowWindow(Application.Handle, SW_SHOWNORMAL);
   AppToFront;
@@ -126,21 +147,12 @@ end;
 
 procedure TForm1.WorkTimerTimer(Sender: TObject);
 begin
-  if FCurrentTime + 1 < FWorkTime then
-  begin
-    // work continues
-    Inc(FCurrentTime);
-    UpdateLabel;
-  end
-  else if FCurrentTime + 1 = FWorkTime then
+  Inc(FCurrentTime);
+  Label1.Caption := IntToStr(FWorkTime - FCurrentTime);
+  if FCurrentTime >= FWorkTime then
   begin
     // work ended
     RestoreFromTray;
-    Inc(FCurrentTime);
-    UpdateLabel;
-  end
-  else
-  begin
     WorkTimer.Enabled := False;
     FCurrentTime := 0;
   end;
@@ -174,11 +186,6 @@ begin
       ShowMessage('Error saving settings: ' + E.Message);
   end;
   IniFile.Free;
-end;
-
-procedure TForm1.UpdateLabel;
-begin
-  Label1.Caption := IntToStr(FWorkTime - FCurrentTime);
 end;
 
 end.

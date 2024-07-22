@@ -53,6 +53,7 @@ object Form1: TForm1
     Caption = 'Break'
     DisabledImageName = 'btnBreak'
     TabOrder = 1
+    OnClick = btnBreakClick
   end
   object btnSettings: TButton
     Left = 8
@@ -85,5 +86,11 @@ object Form1: TForm1
     OnTimer = WorkTimerTimer
     Left = 200
     Top = 112
+  end
+  object BreakTimer: TTimer
+    Enabled = False
+    OnTimer = BreakTimerTimer
+    Left = 264
+    Top = 120
   end
 end
