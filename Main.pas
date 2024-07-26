@@ -10,6 +10,9 @@ uses
   Settings;
 
 type
+  TActiveTimer = (atNone, atWork, atBreak);
+
+type
   TForm1 = class(TForm)
     btnOK: TButton;
     btnBreak: TButton;
@@ -19,8 +22,8 @@ type
     TrayIcon1: TTrayIcon;
     WorkTimer: TTimer;
     BreakTimer: TTimer;
+    btnChange: TButton;
 
-    // Event Handlers
     procedure FormCreate(Sender: TObject);
     procedure FormResize(Sender: TObject);
     procedure btnSettingsClick(Sender: TObject);
@@ -29,15 +32,15 @@ type
     procedure TrayIcon1Click(Sender: TObject);
     procedure WorkTimerTimer(Sender: TObject);
     procedure BreakTimerTimer(Sender: TObject);
+    procedure btnChangeClick(Sender: TObject);
     procedure btnMuteClick(Sender: TObject);
 
   private
-    // Private Fields
     FWorkTime: Integer;
     FBreakTime: Integer;
     FCurrentTime: Integer;
+    LastActiveTimer: TActiveTimer;
 
-    // Private Methods
     procedure LoadSettings;
     procedure SaveSettings(AWorkTime, ABreakTime: Integer);
     procedure ToTray;
@@ -60,8 +63,6 @@ implementation
 const
   SETTINGS_FILE = './preferences.ini';
 
-  // Event Handlers
-
 procedure TForm1.FormCreate(Sender: TObject);
 begin
   Color := TColor(RGB(24, 24, 24));
@@ -79,6 +80,7 @@ begin
   btnBreak.Left := Width - btnBreak.Width - 8;
   btnBreak.Top := Height - btnBreak.Height - 8;
   btnSettings.Top := btnBreak.Top;
+  btnChange.Left := (Width - btnChange.Width) div 2;
 end;
 
 procedure TForm1.btnSettingsClick(Sender: TObject);
@@ -114,6 +116,30 @@ begin
     StopNotification;
     Label1.Caption := IntToStr(FBreakTime - FCurrentTime);
     BreakTimer.Enabled := True;
+  end;
+end;
+
+procedure TForm1.btnChangeClick(Sender: TObject);
+begin
+  if WorkTimer.Enabled then
+  begin
+    WorkTimer.Enabled := False;
+    LastActiveTimer := atWork;
+  end
+  else if BreakTimer.Enabled then
+  begin
+    BreakTimer.Enabled := False;
+    LastActiveTimer := atBreak;
+  end
+  else if Label1.Caption <> '0' then
+  begin
+    // Resume the timer that was last active
+    case LastActiveTimer of
+      atWork:
+        WorkTimer.Enabled := True;
+      atBreak:
+        BreakTimer.Enabled := True;
+    end;
   end;
 end;
 
@@ -153,8 +179,6 @@ begin
     FCurrentTime := 0;
   end;
 end;
-
-// Private Methods
 
 procedure TForm1.LoadSettings;
 var

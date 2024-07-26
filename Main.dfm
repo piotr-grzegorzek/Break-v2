@@ -2,7 +2,7 @@ object Form1: TForm1
   Left = 0
   Top = 0
   BorderStyle = bsNone
-  Caption = 'Form1'
+  Caption = 'Break'
   ClientHeight = 480
   ClientWidth = 640
   Color = clBtnFace
@@ -76,6 +76,15 @@ object Form1: TForm1
     DisabledImageName = 'btnOK'
     TabOrder = 3
     OnClick = btnMuteClick
+  end
+  object btnChange: TButton
+    Left = 272
+    Top = 8
+    Width = 75
+    Height = 25
+    Caption = 'Change'
+    TabOrder = 4
+    OnClick = btnChangeClick
   end
   object TrayIcon1: TTrayIcon
     OnClick = TrayIcon1Click
